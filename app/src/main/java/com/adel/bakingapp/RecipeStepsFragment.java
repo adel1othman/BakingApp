@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +44,7 @@ public class RecipeStepsFragment extends Fragment {
 
         rvRecipeDetail.setLayoutManager(layoutManager);
 
-        if (IsTablet(rootView.getContext())){
+        if (isTablet(rootView.getContext())){
             RecipeStepsTabAdapter mAdapter = new RecipeStepsTabAdapter(listRecipes.get(stepPos).getmRecipeSteps());
             rvRecipeDetail.setAdapter(mAdapter);
         }else {
@@ -58,7 +59,7 @@ public class RecipeStepsFragment extends Fragment {
         return rootView;
     }
 
-    public static boolean IsTablet(Context context) {
+    /*public static boolean IsTablet(Context context) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         if (context.getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT){
             int width = metrics.widthPixels;
@@ -73,6 +74,21 @@ public class RecipeStepsFragment extends Fragment {
         }
 
         return false;
+    }*/
+
+    public boolean isTablet(Context context) {
+        try {
+            DisplayMetrics dm = context.getResources().getDisplayMetrics();
+            float screenWidth  = dm.widthPixels / dm.xdpi;
+            float screenHeight = dm.heightPixels / dm.ydpi;
+            double size = Math.sqrt(Math.pow(screenWidth, 2) +
+                    Math.pow(screenHeight, 2));
+            // Tablet devices have a screen size greater than 6 inches
+            return size >= 6;
+        } catch(Throwable t) {
+            Log.e("Failed: ", t.toString());
+            return false;
+        }
     }
 
     @Override
