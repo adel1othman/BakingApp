@@ -18,6 +18,8 @@ import com.adel.bakingapp.RecipeModel.RecipeSteps;
 
 import java.util.List;
 
+import static android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+import static android.content.res.Configuration.ORIENTATION_PORTRAIT;
 import static com.adel.bakingapp.MainActivity.listRecipes;
 import static com.adel.bakingapp.MainActivity.stepPos;
 
@@ -58,10 +60,19 @@ public class RecipeStepsFragment extends Fragment {
 
     public static boolean IsTablet(Context context) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        int width = metrics.widthPixels;
-        int height = metrics.heightPixels;
+        if (context.getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT){
+            int width = metrics.widthPixels;
+            int height = metrics.heightPixels;
 
-        return width > 1080 || height > 1920;
+            return width > 1080 || height > 1920;
+        }else if (context.getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE){
+            int width = metrics.widthPixels;
+            int height = metrics.heightPixels;
+
+            return width > 1920 || height > 1080;
+        }
+
+        return false;
     }
 
     @Override
