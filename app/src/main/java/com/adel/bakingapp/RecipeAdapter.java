@@ -12,7 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.adel.bakingapp.RecipeModel.Recipe;
+import com.adel.bakingapp.recipe_model.Recipe;
 
 import java.util.List;
 

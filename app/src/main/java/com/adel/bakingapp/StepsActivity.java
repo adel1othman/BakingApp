@@ -10,9 +10,11 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.adel.bakingapp.recipe_model.Recipe;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -31,10 +33,17 @@ import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
+import junit.framework.Assert;
+
+import org.junit.Test;
+
+import java.util.List;
+
 import static com.adel.bakingapp.MainActivity.listRecipes;
 
 public class StepsActivity extends AppCompatActivity implements ExoPlayer.EventListener {
 
+    ImageView videoRes;
     TextView tvDes;
     int DEFAULT_POSITION = -1;
     int recipePosition = -1;
@@ -45,11 +54,14 @@ public class StepsActivity extends AppCompatActivity implements ExoPlayer.EventL
     private PlaybackStateCompat.Builder mStateBuilder;
     private static final String TAG = "ExoPlayer";
 
+    private String PLAYBACK_STATE_KEY;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_steps);
 
+        videoRes = findViewById(R.id.iv_video_res);
         tvDes = findViewById(R.id.tv_Des);
         mPlayerView = findViewById(R.id.playerView);
 
@@ -65,27 +77,40 @@ public class StepsActivity extends AppCompatActivity implements ExoPlayer.EventL
 
         initializeMediaSession();
         if (!listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmVideoURL().equals("")){
+            videoRes.setVisibility(View.GONE);
+            mPlayerView.setVisibility(View.VISIBLE);
             initializePlayer(Uri.parse(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmVideoURL()));
         }else {
-            Toast.makeText(this, "No video resource", Toast.LENGTH_SHORT).show();
+            mPlayerView.setVisibility(View.GONE);
+            videoRes.setVisibility(View.VISIBLE);
         }
 
         tvDes.setText(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmDescription());
     }
 
     public void BtnBackClick(View view) {
+        int oldValue = stepPosition;
         --stepPosition;
         if (stepPosition < 0){
             stepPosition = listRecipes.get(recipePosition).getmRecipeSteps().size() - 1;
+
+            BackFuncTest(stepPosition+1, stepPosition);
+        }else {
+            BackFuncTest(oldValue, stepPosition);
         }
 
         backNextFunc();
     }
 
     public void BtnNextClick(View view) {
+        int oldValue = stepPosition;
         ++stepPosition;
         if (stepPosition == listRecipes.get(recipePosition).getmRecipeSteps().size()){
             stepPosition = 0;
+
+            NextFuncTest(stepPosition-1, stepPosition);
+        }else {
+            NextFuncTest(oldValue, stepPosition);
         }
 
         backNextFunc();
@@ -99,9 +124,12 @@ public class StepsActivity extends AppCompatActivity implements ExoPlayer.EventL
         setTitle(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmShortDescription());
 
         if (!listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmVideoURL().equals("")){
+            videoRes.setVisibility(View.GONE);
+            mPlayerView.setVisibility(View.VISIBLE);
             initializePlayer(Uri.parse(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmVideoURL()));
         }else {
-            Toast.makeText(this, "No video resource", Toast.LENGTH_SHORT).show();
+            mPlayerView.setVisibility(View.GONE);
+            videoRes.setVisibility(View.VISIBLE);
         }
 
         tvDes.setText(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmDescription());
@@ -119,6 +147,16 @@ public class StepsActivity extends AppCompatActivity implements ExoPlayer.EventL
 
         return super.onOptionsItemSelected(item);
     }*/
+
+    @Test
+    public void BackFuncTest(int oldValue, int newValue) {
+        Assert.assertTrue("TRUE", oldValue > newValue);
+    }
+
+    @Test
+    public void NextFuncTest(int oldValue, int newValue) {
+        Assert.assertTrue("TRUE", oldValue < newValue);
+    }
 
     private void initializeMediaSession() {
         mMediaSession = new MediaSessionCompat(this, TAG);
@@ -235,5 +273,53 @@ public class StepsActivity extends AppCompatActivity implements ExoPlayer.EventL
         public void onReceive(Context context, Intent intent) {
             MediaButtonReceiver.handleIntent(mMediaSession, intent);
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        if (mExoPlayer != null){
+            long currentPos = mExoPlayer.getCurrentPosition();
+            outState.putLong(PLAYBACK_STATE_KEY, currentPos);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        long currentPos = savedInstanceState.getLong(PLAYBACK_STATE_KEY);
+        mExoPlayer.seekTo(currentPos);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        releasePlayer();
+        mMediaSession.setActive(false);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        releasePlayer();
+        mMediaSession.setActive(false);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        initializePlayer(Uri.parse(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmVideoURL()));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        initializePlayer(Uri.parse(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmVideoURL()));
     }
 }

@@ -3,9 +3,9 @@ package com.adel.bakingapp;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.adel.bakingapp.RecipeModel.Recipe;
-import com.adel.bakingapp.RecipeModel.RecipeIngredients;
-import com.adel.bakingapp.RecipeModel.RecipeSteps;
+import com.adel.bakingapp.recipe_model.Recipe;
+import com.adel.bakingapp.recipe_model.RecipeIngredients;
+import com.adel.bakingapp.recipe_model.RecipeSteps;
 
 import org.json.JSONArray;
 import org.json.JSONException;

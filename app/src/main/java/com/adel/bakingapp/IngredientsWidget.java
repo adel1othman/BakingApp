@@ -53,7 +53,7 @@ public class IngredientsWidget extends AppWidgetProvider {
 
             RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.ingredients_widget);
 
-            rv.setRemoteAdapter(appWidgetId, R.id.list_view, intent);
+            rv.setRemoteAdapter(R.id.list_view, intent);
 
             /*Intent startActivityIntent = new Intent(context, RecipeDetails.class);
 

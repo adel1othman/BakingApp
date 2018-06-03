@@ -7,7 +7,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.adel.bakingapp.RecipeModel.RecipeIngredients;
+import com.adel.bakingapp.recipe_model.RecipeIngredients;
 import static com.adel.bakingapp.MainActivity.listRecipes;
 import static com.adel.bakingapp.MainActivity.stepPos;
 

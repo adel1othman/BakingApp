@@ -15,7 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.adel.bakingapp.RecipeModel.RecipeSteps;
+import com.adel.bakingapp.recipe_model.RecipeSteps;
 
 import java.util.List;
 
@@ -58,23 +58,6 @@ public class RecipeStepsFragment extends Fragment {
 
         return rootView;
     }
-
-    /*public static boolean IsTablet(Context context) {
-        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        if (context.getResources().getConfiguration().orientation == ORIENTATION_PORTRAIT){
-            int width = metrics.widthPixels;
-            int height = metrics.heightPixels;
-
-            return width > 1080 || height > 1920;
-        }else if (context.getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE){
-            int width = metrics.widthPixels;
-            int height = metrics.heightPixels;
-
-            return width > 1920 || height > 1080;
-        }
-
-        return false;
-    }*/
 
     public boolean isTablet(Context context) {
         try {

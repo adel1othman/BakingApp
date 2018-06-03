@@ -12,6 +12,14 @@
         android:layout_height="0dp"
         android:layout_weight="1"/>
 
+    <ImageView
+        android:id="@+id/iv_video_res"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:src="@drawable/not_available"
+        android:visibility="gone"/>
+
     <TextView
         android:id="@+id/tv_Des"
         android:layout_width="wrap_content"

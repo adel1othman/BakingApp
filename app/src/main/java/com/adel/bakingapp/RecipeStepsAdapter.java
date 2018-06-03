@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.adel.bakingapp.RecipeModel.RecipeSteps;
+import com.adel.bakingapp.recipe_model.RecipeSteps;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -74,10 +74,10 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
 
             step.setText(mRecipeSteps.get(listIndex).getmShortDescription());
 
-            if (!mRecipeSteps.get(listIndex).getmThumbnailURL().equals("")){
-                Picasso.with(context)
-                        .load(mRecipeSteps.get(listIndex).getmThumbnailURL())
-                        .into(thumbnail);
+            if (!mRecipeSteps.get(listIndex).getmVideoURL().equals("")){
+                thumbnail.setImageResource(R.drawable.video);
+            }else {
+                thumbnail.setImageResource(R.drawable.no_video);
             }
         }
     }

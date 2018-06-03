@@ -3,7 +3,7 @@ package com.adel.bakingapp;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 
-import com.adel.bakingapp.RecipeModel.Recipe;
+import com.adel.bakingapp.recipe_model.Recipe;
 
 import java.util.List;
 

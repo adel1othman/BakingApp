@@ -1,4 +1,4 @@
-package com.adel.bakingapp.RecipeModel;
+package com.adel.bakingapp.recipe_model;
 
 import java.util.List;
 

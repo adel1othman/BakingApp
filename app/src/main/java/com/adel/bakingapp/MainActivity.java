@@ -22,7 +22,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.adel.bakingapp.RecipeModel.Recipe;
+import com.adel.bakingapp.recipe_model.Recipe;
 
 import java.util.ArrayList;
 import java.util.List;

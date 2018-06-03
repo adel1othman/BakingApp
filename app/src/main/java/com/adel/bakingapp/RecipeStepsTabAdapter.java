@@ -17,7 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.adel.bakingapp.RecipeModel.RecipeSteps;
+import com.adel.bakingapp.recipe_model.RecipeSteps;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -102,21 +102,19 @@ public class RecipeStepsTabAdapter extends RecyclerView.Adapter<RecipeStepsTabAd
                     releasePlayer();
                     if (!mRecipeSteps.get(listIndex).getmVideoURL().equals("")){
                         initializePlayer(Uri.parse(mRecipeSteps.get(listIndex).getmVideoURL()));
-                    }else {
-                        Toast.makeText(context, "No video resource", Toast.LENGTH_SHORT).show();
                     }
-
-                    tvDes.setText(mRecipeSteps.get(listIndex).getmDescription());
                 }
             });
 
-            step.setText(mRecipeSteps.get(listIndex).getmShortDescription());
-
-            if (!mRecipeSteps.get(listIndex).getmThumbnailURL().equals("")){
-                Picasso.with(context)
-                        .load(mRecipeSteps.get(listIndex).getmThumbnailURL())
-                        .into(thumbnail);
+            if (!mRecipeSteps.get(listIndex).getmVideoURL().equals("")){
+                thumbnail.setImageResource(R.drawable.video);
+            }else {
+                thumbnail.setImageResource(R.drawable.no_video);
             }
+
+            tvDes.setText(mRecipeSteps.get(listIndex).getmDescription());
+
+            step.setText(mRecipeSteps.get(listIndex).getmShortDescription());
         }
     }
 
