@@ -54,12 +54,14 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
         LinearLayout container;
         TextView step;
         ImageView thumbnail;
+        ImageView vidAvailability;
 
         RecipeStepsViewHolder(View itemView) {
             super(itemView);
             container = itemView.findViewById(R.id.item_detail_container);
             step = itemView.findViewById(R.id.tv_step);
             thumbnail = itemView.findViewById(R.id.iv_thumbnail);
+            vidAvailability = itemView.findViewById(R.id.iv_vid_state);
         }
 
         void bind(final int listIndex) {
@@ -67,17 +69,27 @@ public class RecipeStepsAdapter extends RecyclerView.Adapter<RecipeStepsAdapter.
             container.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    RecipeDetails.scrollPos = getAdapterPosition();
+                    RecipeDetails.isFirstTime = true;
                     launchStepsActivity(mRecipeSteps.get(listIndex).getmRecipeStepID(), getAdapterPosition());
                 }
             });
 
             step.setText(mRecipeSteps.get(listIndex).getmShortDescription());
 
+            if (!mRecipeSteps.get(listIndex).getmThumbnailURL().equals("")){
+                try {
+                    Picasso.with(context)
+                            .load(mRecipeSteps.get(listIndex).getmThumbnailURL())
+                            .into(thumbnail);
+                }catch (Exception ex){
+                    Log.d("Invalid image url: ", ex.getMessage());
+                }
+            }
+
             if (!mRecipeSteps.get(listIndex).getmVideoURL().equals("")){
-                thumbnail.setImageResource(R.drawable.video);
+                vidAvailability.setImageResource(R.drawable.video);
             }else {
-                thumbnail.setImageResource(R.drawable.no_video);
+                vidAvailability.setImageResource(R.drawable.no_video);
             }
         }
     }

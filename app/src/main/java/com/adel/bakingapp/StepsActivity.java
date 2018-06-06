@@ -14,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.adel.bakingapp.recipe_model.Recipe;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -37,8 +36,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import java.util.List;
-
 import static com.adel.bakingapp.MainActivity.listRecipes;
 
 public class StepsActivity extends AppCompatActivity implements ExoPlayer.EventListener {
@@ -47,14 +44,18 @@ public class StepsActivity extends AppCompatActivity implements ExoPlayer.EventL
     TextView tvDes;
     int DEFAULT_POSITION = -1;
     int recipePosition = -1;
-    int stepPosition = -1;
+    private int stepPosition = -1;
+    private long playerPos = 0;
+    private boolean isPlaying = true;
     private SimpleExoPlayer mExoPlayer;
     private SimpleExoPlayerView mPlayerView;
     private static MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
     private static final String TAG = "ExoPlayer";
 
-    private String PLAYBACK_STATE_KEY;
+    public static final String PLAYBACK_STATE_KEY = "PLAYBACK_STATE_KEY";
+    public static final String VIDEO_ID_KEY = "VIDEO_ID_KEY";
+    public static final String PLAY_STATE_KEY = "PLAY_STATE_KEY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,26 +67,46 @@ public class StepsActivity extends AppCompatActivity implements ExoPlayer.EventL
         mPlayerView = findViewById(R.id.playerView);
 
         Intent intent = getIntent();
-        if (intent == null) {
-            closeOnError();
-        }else {
+        if (intent != null){
             recipePosition = intent.getIntExtra("extra_position_recipe", DEFAULT_POSITION);
-            stepPosition = intent.getIntExtra("extra_position_step", DEFAULT_POSITION);
         }
 
-        setTitle(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmShortDescription());
-
-        initializeMediaSession();
-        if (!listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmVideoURL().equals("")){
-            videoRes.setVisibility(View.GONE);
-            mPlayerView.setVisibility(View.VISIBLE);
+        if (savedInstanceState != null){
+            stepPosition = savedInstanceState.getInt(VIDEO_ID_KEY);
+            boolean isPlaying = savedInstanceState.getBoolean(PLAY_STATE_KEY);
+            long currentPos = savedInstanceState.getLong(PLAYBACK_STATE_KEY);
+            initializeMediaSession();
             initializePlayer(Uri.parse(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmVideoURL()));
+            mExoPlayer.seekTo(currentPos);
+            if (isPlaying){
+                mExoPlayer.setPlayWhenReady(true);
+            }else {
+                mExoPlayer.setPlayWhenReady(false);
+            }
+            setTitle(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmShortDescription());
+            tvDes.setText(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmDescription());
         }else {
-            mPlayerView.setVisibility(View.GONE);
-            videoRes.setVisibility(View.VISIBLE);
-        }
+            Intent intent1 = getIntent();
+            if (intent == null) {
+                closeOnError();
+            }else {
+                stepPosition = intent.getIntExtra("extra_position_step", DEFAULT_POSITION);
+            }
 
-        tvDes.setText(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmDescription());
+            setTitle(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmShortDescription());
+
+            initializeMediaSession();
+            if (!listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmVideoURL().equals("")){
+                videoRes.setVisibility(View.GONE);
+                mPlayerView.setVisibility(View.VISIBLE);
+                initializePlayer(Uri.parse(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmVideoURL()));
+            }else {
+                mPlayerView.setVisibility(View.GONE);
+                videoRes.setVisibility(View.VISIBLE);
+            }
+
+            tvDes.setText(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmDescription());
+        }
     }
 
     public void BtnBackClick(View view) {
@@ -276,50 +297,61 @@ public class StepsActivity extends AppCompatActivity implements ExoPlayer.EventL
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
 
-        if (mExoPlayer != null){
-            long currentPos = mExoPlayer.getCurrentPosition();
-            outState.putLong(PLAYBACK_STATE_KEY, currentPos);
-        }
+        savedInstanceState.putLong(PLAYBACK_STATE_KEY, playerPos);
+        savedInstanceState.putInt(VIDEO_ID_KEY, stepPosition);
+        savedInstanceState.putBoolean(PLAY_STATE_KEY, isPlaying);
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
+        stepPosition = savedInstanceState.getInt(VIDEO_ID_KEY);
+        boolean isPlaying = savedInstanceState.getBoolean(PLAY_STATE_KEY);
         long currentPos = savedInstanceState.getLong(PLAYBACK_STATE_KEY);
+        initializePlayer(Uri.parse(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmVideoURL()));
         mExoPlayer.seekTo(currentPos);
+        if (isPlaying){
+            mExoPlayer.setPlayWhenReady(true);
+        }else {
+            mExoPlayer.setPlayWhenReady(false);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        releasePlayer();
-        mMediaSession.setActive(false);
+        if (mExoPlayer != null){
+            playerPos = mExoPlayer.getCurrentPosition();
+            isPlaying = mExoPlayer.getPlayWhenReady();
+            releasePlayer();
+            mMediaSession.setActive(false);
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        releasePlayer();
-        mMediaSession.setActive(false);
+        if (mExoPlayer != null){
+            playerPos = mExoPlayer.getCurrentPosition();
+            isPlaying = mExoPlayer.getPlayWhenReady();
+            releasePlayer();
+            mMediaSession.setActive(false);
+        }
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        initializePlayer(Uri.parse(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmVideoURL()));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        initializePlayer(Uri.parse(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmVideoURL()));
     }
 }

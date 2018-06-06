@@ -3,6 +3,7 @@ package com.adel.bakingapp;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.OrientationEventListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,16 +18,24 @@ public class RecipeDetails extends AppCompatActivity {
     private String TITLE_KEY;
     private String RECIPE_KEY;
     private String title = "";
-    static int scrollPos = -1;
+    static boolean isFirstTime = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_details);
 
-        FragmentManager fm = getSupportFragmentManager();
-        RecipeStepsFragment stepsFragment = new RecipeStepsFragment();
-        fm.beginTransaction().add(R.id.content, stepsFragment, "0").commit();
+        final FragmentManager fm = getSupportFragmentManager();
+        if (isFirstTime){
+            RecipeStepsFragment stepsFragment = new RecipeStepsFragment();
+            fm.beginTransaction().add(R.id.content, stepsFragment, "0").commit();
+
+            if (RecipeStepsFragment.isTablet(this)){
+                fm.beginTransaction().add(R.id.content1, RecipeDetailsDesFragment.newInstance(0), "1").commit();
+            }
+
+            isFirstTime = false;
+        }
 
         TextView tvIngredient = findViewById(R.id.tv_ingredient);
 
@@ -54,5 +63,15 @@ public class RecipeDetails extends AppCompatActivity {
     private void closeOnError() {
         finish();
         Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
     }
 }

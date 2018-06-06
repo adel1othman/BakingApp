@@ -75,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        RecipeDetails.isFirstTime = true;
+
         loadingIndicator = findViewById(R.id.loading_indicator);
         recipeRecyclerView = findViewById(R.id.rv_recipes);
         layoutManager = new GridLayoutManager(this, calculateNoOfColumns(this));

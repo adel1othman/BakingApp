@@ -1,52 +1,23 @@
 package com.adel.bakingapp;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.media.session.MediaButtonReceiver;
-import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.adel.bakingapp.recipe_model.RecipeSteps;
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.LoadControl;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.TrackGroupArray;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.util.Util;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class RecipeStepsTabAdapter extends RecyclerView.Adapter<RecipeStepsTabAdapter.RecipeStepsViewHolder> implements ExoPlayer.EventListener {
-
-    TextView tvDes;
-    private SimpleExoPlayer mExoPlayer;
-    private SimpleExoPlayerView mPlayerView;
-    private static MediaSessionCompat mMediaSessionTab;
-    private PlaybackStateCompat.Builder mStateBuilder;
-    private static final String TAG = "ExoPlayer";
+public class RecipeStepsTabAdapter extends RecyclerView.Adapter<RecipeStepsTabAdapter.RecipeStepsViewHolder> {
 
     private Context context;
     private List<RecipeSteps> mRecipeSteps;
@@ -62,17 +33,11 @@ public class RecipeStepsTabAdapter extends RecyclerView.Adapter<RecipeStepsTabAd
 
         View view = View.inflate(context, R.layout.list_item_details, null);
 
-        initializeMediaSession();
-
-        tvDes = viewGroup.getRootView().findViewById(R.id.tv_step_instruction);
-        mPlayerView = viewGroup.getRootView().findViewById(R.id.playerViewDetails);
-
         return new RecipeStepsViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecipeStepsViewHolder holder, int position) {
-        Log.d(TAG, "#" + position);
         holder.bind(position);
     }
 
@@ -86,12 +51,14 @@ public class RecipeStepsTabAdapter extends RecyclerView.Adapter<RecipeStepsTabAd
         LinearLayout container;
         TextView step;
         ImageView thumbnail;
+        ImageView vidAvailability;
 
         RecipeStepsViewHolder(View itemView) {
             super(itemView);
             container = itemView.findViewById(R.id.item_detail_container);
             step = itemView.findViewById(R.id.tv_step);
             thumbnail = itemView.findViewById(R.id.iv_thumbnail);
+            vidAvailability = itemView.findViewById(R.id.iv_vid_state);
         }
 
         void bind(final int listIndex) {
@@ -99,139 +66,29 @@ public class RecipeStepsTabAdapter extends RecyclerView.Adapter<RecipeStepsTabAd
             container.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    releasePlayer();
-                    if (!mRecipeSteps.get(listIndex).getmVideoURL().equals("")){
-                        initializePlayer(Uri.parse(mRecipeSteps.get(listIndex).getmVideoURL()));
-                    }
+                    ((FragmentActivity)context).getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.content1, RecipeDetailsDesFragment.newInstance(listIndex))
+                            .commit();
                 }
             });
 
-            if (!mRecipeSteps.get(listIndex).getmVideoURL().equals("")){
-                thumbnail.setImageResource(R.drawable.video);
-            }else {
-                thumbnail.setImageResource(R.drawable.no_video);
+            if (!mRecipeSteps.get(listIndex).getmThumbnailURL().equals("")){
+                try {
+                    Picasso.with(context)
+                            .load(mRecipeSteps.get(listIndex).getmThumbnailURL())
+                            .into(thumbnail);
+                }catch (Exception ex){
+                    Log.d("Invalid image url: ", ex.getMessage());
+                }
             }
 
-            tvDes.setText(mRecipeSteps.get(listIndex).getmDescription());
+            if (!mRecipeSteps.get(listIndex).getmVideoURL().equals("")){
+                vidAvailability.setImageResource(R.drawable.video);
+            }else {
+                vidAvailability.setImageResource(R.drawable.no_video);
+            }
 
             step.setText(mRecipeSteps.get(listIndex).getmShortDescription());
-        }
-    }
-
-    public void delete(int position) {
-        mRecipeSteps.remove(position);
-        notifyItemRemoved(position);
-    }
-
-    private void initializeMediaSession() {
-        mMediaSessionTab = new MediaSessionCompat(context, TAG);
-        mMediaSessionTab.setFlags(
-                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-        mMediaSessionTab.setMediaButtonReceiver(null);
-        mStateBuilder = new PlaybackStateCompat.Builder()
-                .setActions(
-                        PlaybackStateCompat.ACTION_PLAY |
-                                PlaybackStateCompat.ACTION_PAUSE |
-                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
-                                PlaybackStateCompat.ACTION_PLAY_PAUSE);
-
-        mMediaSessionTab.setPlaybackState(mStateBuilder.build());
-
-        mMediaSessionTab.setCallback(new MySessionCallback());
-
-        mMediaSessionTab.setActive(true);
-    }
-
-    private void initializePlayer(Uri mediaUri) {
-        if (mExoPlayer == null) {
-            TrackSelector trackSelector = new DefaultTrackSelector();
-            LoadControl loadControl = new DefaultLoadControl();
-            mExoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector, loadControl);
-            mPlayerView.setPlayer(mExoPlayer);
-
-            mExoPlayer.addListener(this);
-
-            String userAgent = Util.getUserAgent(context, "Baking App");
-            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
-                    context, userAgent), new DefaultExtractorsFactory(), null, null);
-            mExoPlayer.prepare(mediaSource);
-            mExoPlayer.setPlayWhenReady(true);
-        }
-    }
-
-    private void releasePlayer() {
-        if (mExoPlayer != null) {
-            mExoPlayer.stop();
-            mExoPlayer.release();
-            mExoPlayer = null;
-        }
-    }
-
-    /*@Override
-    protected void onDestroy() {
-        super.onDestroy();
-        releasePlayer();
-        mMediaSession.setActive(false);
-    }*/
-
-    @Override
-    public void onTimelineChanged(Timeline timeline, Object manifest) {
-    }
-
-    @Override
-    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-    }
-
-    @Override
-    public void onLoadingChanged(boolean isLoading) {
-    }
-
-    @Override
-    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        if((playbackState == ExoPlayer.STATE_READY) && playWhenReady){
-            mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
-                    mExoPlayer.getCurrentPosition(), 1f);
-        } else if((playbackState == ExoPlayer.STATE_READY)){
-            mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
-                    mExoPlayer.getCurrentPosition(), 1f);
-        }
-        mMediaSessionTab.setPlaybackState(mStateBuilder.build());
-    }
-
-    @Override
-    public void onPlayerError(ExoPlaybackException error) {
-    }
-
-    @Override
-    public void onPositionDiscontinuity() {
-    }
-
-    private class MySessionCallback extends MediaSessionCompat.Callback {
-        @Override
-        public void onPlay() {
-            mExoPlayer.setPlayWhenReady(true);
-        }
-
-        @Override
-        public void onPause() {
-            mExoPlayer.setPlayWhenReady(false);
-        }
-
-        @Override
-        public void onSkipToPrevious() {
-            mExoPlayer.seekTo(0);
-        }
-    }
-
-    public static class MediaReceiver extends BroadcastReceiver {
-
-        public MediaReceiver() {
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            MediaButtonReceiver.handleIntent(mMediaSessionTab, intent);
         }
     }
 }

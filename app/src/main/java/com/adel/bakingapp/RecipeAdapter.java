@@ -9,10 +9,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v7.widget.RecyclerView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.adel.bakingapp.recipe_model.Recipe;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -54,11 +56,13 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
         LinearLayout container;
         TextView name;
+        ImageView recipeImage;
 
         RecipeViewHolder(View itemView) {
             super(itemView);
             container = itemView.findViewById(R.id.item_container);
             name = itemView.findViewById(R.id.tv_name);
+            recipeImage = itemView.findViewById(R.id.recipe_img);
         }
 
         void bind(final int listIndex) {
@@ -78,6 +82,16 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             });
 
             name.setText(mRecipes.get(listIndex).getmName());
+
+            if (!mRecipes.get(listIndex).getmImage().equals("")){
+                try {
+                    Picasso.with(context)
+                            .load(mRecipes.get(listIndex).getmImage())
+                            .into(recipeImage);
+                }catch (Exception ex){
+                    Log.d("Invalid image url: ", ex.getMessage());
+                }
+            }
         }
     }
 

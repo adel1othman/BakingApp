@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+        android:id="@+id/playerViewDetails"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <ImageView
+        android:id="@+id/iv_video_res_tab"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:src="@drawable/not_available"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/tv_step_instruction"
+        android:background="@drawable/t_border"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:gravity="center"
+        android:textColor="@android:color/white" />
+
+</LinearLayout>

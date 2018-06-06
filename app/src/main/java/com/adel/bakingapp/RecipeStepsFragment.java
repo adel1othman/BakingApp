@@ -30,7 +30,7 @@ public class RecipeStepsFragment extends Fragment {
     RecyclerView rvRecipeDetail;
     GridLayoutManager layoutManager;
     private Parcelable mListState;
-    private String STATE_KEY;
+    private String STATE_KEY = "STATE_KEY";
     LoaderManager.LoaderCallbacks<List<RecipeSteps>> myCallbacks;
 
 
@@ -52,14 +52,10 @@ public class RecipeStepsFragment extends Fragment {
             rvRecipeDetail.setAdapter(mAdapter);
         }
 
-        if (RecipeDetails.scrollPos != -1){
-            layoutManager.scrollToPosition(RecipeDetails.scrollPos);
-        }
-
         return rootView;
     }
 
-    public boolean isTablet(Context context) {
+    public static boolean isTablet(Context context) {
         try {
             DisplayMetrics dm = context.getResources().getDisplayMetrics();
             float screenWidth  = dm.widthPixels / dm.xdpi;
@@ -83,7 +79,7 @@ public class RecipeStepsFragment extends Fragment {
     }
 
     @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+    public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
         if(savedInstanceState != null){
