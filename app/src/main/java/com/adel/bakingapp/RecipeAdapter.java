@@ -44,6 +44,13 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
     public void onBindViewHolder(@NonNull RecipeViewHolder holder, int position) {
         Log.d(TAG, "#" + position);
         holder.bind(position);
+
+        if (position == 2) {
+            holder.setwantedElement(true);
+            holder.name.setText(String.format("Special %s", mRecipes.get(2).getmName()));
+        } else {
+            holder.setwantedElement(false);
+        }
     }
 
     @Override
@@ -54,6 +61,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     class RecipeViewHolder extends RecyclerView.ViewHolder {
 
+        private boolean mIsWantedElement = false;
         LinearLayout container;
         TextView name;
         ImageView recipeImage;
@@ -92,6 +100,14 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
                     Log.d("Invalid image url: ", ex.getMessage());
                 }
             }
+        }
+
+        boolean getWantedElement() {
+            return mIsWantedElement;
+        }
+
+        void setwantedElement(boolean mIsInTheMiddle) {
+            this.mIsWantedElement = mIsInTheMiddle;
         }
     }
 

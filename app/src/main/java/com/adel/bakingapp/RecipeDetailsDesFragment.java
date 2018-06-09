@@ -51,8 +51,8 @@ public class RecipeDetailsDesFragment extends Fragment implements ExoPlayer.Even
     private PlaybackStateCompat.Builder mStateBuilder;
     private static final String TAG = "ExoPlayer";
     private int stepPosition = 0;
-    private long playerPos;
-    private boolean isPlaying;
+    private long playerPos = 0;
+    private boolean isPlaying = true;
 
     private Context context;
     private String STATE_KEY = "STATE_KEY";
@@ -216,10 +216,10 @@ public class RecipeDetailsDesFragment extends Fragment implements ExoPlayer.Even
 
         if (savedInstanceState != null){
             stepPosition = savedInstanceState.getInt(VIDEO_ID_KEY_TAB);
-            boolean isPlaying = savedInstanceState.getBoolean(PLAY_STATE_KEY_TAB);
-            long currentPos = savedInstanceState.getLong(PLAYBACK_STATE_KEY_TAB);
+            isPlaying = savedInstanceState.getBoolean(PLAY_STATE_KEY_TAB);
+            playerPos = savedInstanceState.getLong(PLAYBACK_STATE_KEY_TAB);
             initializePlayer(Uri.parse(listRecipes.get(stepPos).getmRecipeSteps().get(stepPosition).getmVideoURL()));
-            mExoPlayer.seekTo(currentPos);
+            mExoPlayer.seekTo(playerPos);
             if (isPlaying){
                 mExoPlayer.setPlayWhenReady(true);
             }else {
@@ -243,13 +243,6 @@ public class RecipeDetailsDesFragment extends Fragment implements ExoPlayer.Even
     @Override
     public void onStop() {
         super.onStop();
-
-        if (mExoPlayer != null){
-            playerPos = mExoPlayer.getCurrentPosition();
-            isPlaying = mExoPlayer.getPlayWhenReady();
-            releasePlayer();
-            mMediaSessionTab.setActive(false);
-        }
     }
 
     @Override
@@ -260,5 +253,13 @@ public class RecipeDetailsDesFragment extends Fragment implements ExoPlayer.Even
     @Override
     public void onResume() {
         super.onResume();
+
+        initializePlayer(Uri.parse(listRecipes.get(stepPos).getmRecipeSteps().get(stepPosition).getmVideoURL()));
+        mExoPlayer.seekTo(playerPos);
+        if (isPlaying){
+            mExoPlayer.setPlayWhenReady(true);
+        }else {
+            mExoPlayer.setPlayWhenReady(false);
+        }
     }
 }

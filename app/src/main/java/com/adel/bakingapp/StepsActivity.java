@@ -37,6 +37,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import static com.adel.bakingapp.MainActivity.listRecipes;
+import static com.adel.bakingapp.MainActivity.stepPos;
 
 public class StepsActivity extends AppCompatActivity implements ExoPlayer.EventListener {
 
@@ -336,13 +337,6 @@ public class StepsActivity extends AppCompatActivity implements ExoPlayer.EventL
     @Override
     protected void onStop() {
         super.onStop();
-
-        if (mExoPlayer != null){
-            playerPos = mExoPlayer.getCurrentPosition();
-            isPlaying = mExoPlayer.getPlayWhenReady();
-            releasePlayer();
-            mMediaSession.setActive(false);
-        }
     }
 
     @Override
@@ -353,5 +347,13 @@ public class StepsActivity extends AppCompatActivity implements ExoPlayer.EventL
     @Override
     protected void onResume() {
         super.onResume();
+
+        initializePlayer(Uri.parse(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmVideoURL()));
+        mExoPlayer.seekTo(playerPos);
+        if (isPlaying){
+            mExoPlayer.setPlayWhenReady(true);
+        }else {
+            mExoPlayer.setPlayWhenReady(false);
+        }
     }
 }
