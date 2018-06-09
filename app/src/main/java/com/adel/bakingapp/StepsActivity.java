@@ -311,10 +311,10 @@ public class StepsActivity extends AppCompatActivity implements ExoPlayer.EventL
         super.onRestoreInstanceState(savedInstanceState);
 
         stepPosition = savedInstanceState.getInt(VIDEO_ID_KEY);
-        boolean isPlaying = savedInstanceState.getBoolean(PLAY_STATE_KEY);
-        long currentPos = savedInstanceState.getLong(PLAYBACK_STATE_KEY);
+        isPlaying = savedInstanceState.getBoolean(PLAY_STATE_KEY);
+        playerPos = savedInstanceState.getLong(PLAYBACK_STATE_KEY);
         initializePlayer(Uri.parse(listRecipes.get(recipePosition).getmRecipeSteps().get(stepPosition).getmVideoURL()));
-        mExoPlayer.seekTo(currentPos);
+        mExoPlayer.seekTo(playerPos);
         if (isPlaying){
             mExoPlayer.setPlayWhenReady(true);
         }else {
