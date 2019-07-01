@@ -5,14 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.media.session.MediaButtonReceiver;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -37,7 +38,6 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import static com.adel.bakingapp.MainActivity.listRecipes;
-import static com.adel.bakingapp.MainActivity.stepPos;
 
 public class StepsActivity extends AppCompatActivity implements ExoPlayer.EventListener {
 

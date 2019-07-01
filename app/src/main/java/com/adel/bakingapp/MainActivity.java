@@ -1,26 +1,25 @@
 package com.adel.bakingapp;
 
-import android.content.Intent;
-import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
-import android.support.test.espresso.IdlingResource;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.IdlingResource;
 
 import com.adel.bakingapp.recipe_model.Recipe;
 
@@ -60,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         if (mIdlingResource == null) {
             mIdlingResource = new SimpleIdlingRes();
         }
-        return mIdlingResource;
+        return (IdlingResource) mIdlingResource;
     }
 
     @Override

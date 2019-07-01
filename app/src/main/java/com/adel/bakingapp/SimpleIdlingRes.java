@@ -1,13 +1,14 @@
 package com.adel.bakingapp;
 
-import android.support.annotation.Nullable;
-import android.support.test.espresso.IdlingResource;
+import androidx.annotation.Nullable;
+import androidx.test.espresso.IdlingResource;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SimpleIdlingRes implements IdlingResource {
 
-    @Nullable private volatile ResourceCallback mCallback;
+    @Nullable
+    private volatile ResourceCallback mCallback;
 
     private AtomicBoolean mIsIdleNow = new AtomicBoolean(true);
 
